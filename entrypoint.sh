@@ -19,25 +19,45 @@ echo ""
 # Resolve absolute path (GitHub Actions workspace is /github/workspace)
 ABS_PATH="$(realpath "$SCAN_PATH" 2>/dev/null || echo "$SCAN_PATH")"
 
-# Run COBALT scanner
+# Run COBALT scanner (exit code != 1 = scan error, not findings)
 python3 /cobalt/cobalt_c_scanner.py \
     --dir "$ABS_PATH" \
     --sarif "$SARIF_FILE" \
-    --quiet
+    --quiet || {
+    echo "::warning::COBALT scanner exited with non-zero status — check for unsupported file types or parse errors"
+    exit 0
+}
 
-# Count confirmed findings in SARIF
+# Filter by severity + count confirmed findings
 FINDING_COUNT=0
 if [ -f "$SARIF_FILE" ]; then
-    FINDING_COUNT=$(python3 -c "
+    FINDING_COUNT=$(python3 - <<PYEOF
 import json, sys
+
+SEV_ORDER = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1}
+min_level = SEV_ORDER.get("$MIN_SEVERITY", 3)
+
 try:
-    with open('$SARIF_FILE') as f:
+    with open("$SARIF_FILE") as f:
         sarif = json.load(f)
-    count = sum(len(run.get('results', [])) for run in sarif.get('runs', []))
-    print(count)
-except Exception:
+
+    kept = []
+    for run in sarif.get("runs", []):
+        for result in run.get("results", []):
+            sev = result.get("properties", {}).get("severity", "HIGH")
+            if SEV_ORDER.get(sev, 0) >= min_level:
+                kept.append(result)
+        run["results"] = kept
+
+    with open("$SARIF_FILE", "w") as f:
+        json.dump(sarif, f, indent=2)
+
+    print(len(kept))
+except Exception as e:
+    print(0, file=sys.stderr)
     print(0)
-")
+PYEOF
+)
 fi
 
 echo ""

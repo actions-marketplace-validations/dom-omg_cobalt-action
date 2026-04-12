@@ -27,10 +27,8 @@ inputs:
 outputs:
   sarif-file:
     description: 'Path to the generated SARIF file'
-    value: ${{ inputs.sarif-file }}
   finding-count:
     description: 'Number of Z3-confirmed findings'
-    value: ${{ steps.scan.outputs.finding-count }}
 
 runs:
   using: 'docker'
