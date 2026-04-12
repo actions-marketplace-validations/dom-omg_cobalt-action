@@ -1,0 +1,42 @@
+name: 'COBALT Security Scanner'
+description: 'Z3-verified integer overflow detection (CWE-190/195/196/197) for C/C++ repos. Zero false positives — every finding is formally proven reachable by the Z3 SMT solver.'
+author: 'Dominik Blain — QreativeLab'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Directory to scan (default: repo root)'
+    required: false
+    default: '.'
+  severity:
+    description: 'Minimum severity to report: CRITICAL, HIGH, MEDIUM, LOW'
+    required: false
+    default: 'HIGH'
+  sarif-file:
+    description: 'Path to write SARIF output file'
+    required: false
+    default: 'cobalt-results.sarif'
+  fail-on-findings:
+    description: 'Exit with code 1 if confirmed findings are found'
+    required: false
+    default: 'false'
+
+outputs:
+  sarif-file:
+    description: 'Path to the generated SARIF file'
+    value: ${{ inputs.sarif-file }}
+  finding-count:
+    description: 'Number of Z3-confirmed findings'
+    value: ${{ steps.scan.outputs.finding-count }}
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.path }}
+    - ${{ inputs.severity }}
+    - ${{ inputs.sarif-file }}
+    - ${{ inputs.fail-on-findings }}
