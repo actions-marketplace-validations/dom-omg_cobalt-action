@@ -32,7 +32,7 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://ghcr.io/dom-omg/cobalt:v1'
   args:
     - ${{ inputs.path }}
     - ${{ inputs.severity }}
