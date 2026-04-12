@@ -64,8 +64,9 @@ echo ""
 echo "  Z3-confirmed findings: $FINDING_COUNT"
 echo ""
 
-# Set output for GitHub Actions
+# Set outputs for GitHub Actions
 echo "finding-count=$FINDING_COUNT" >> "${GITHUB_OUTPUT:-/dev/null}"
+echo "sarif-file=$SARIF_FILE"       >> "${GITHUB_OUTPUT:-/dev/null}"
 
 # Fail if requested and findings exist
 if [ "$FAIL_ON_FINDINGS" = "true" ] && [ "$FINDING_COUNT" -gt 0 ]; then

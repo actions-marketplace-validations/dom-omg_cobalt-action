@@ -19,8 +19,8 @@ RUN pip3 install --no-cache-dir \
     z3-solver==4.13.0.0 \
     libclang==14.0.6
 
-# Symlink: libclang Python binding ctypes search fallback
-RUN ln -sf /usr/lib/x86_64-linux-gnu/libclang-14.so.1 /usr/lib/libclang.so
+# Symlink: libclang Python binding ctypes search fallback (arch-agnostic)
+RUN find /usr/lib -name "libclang-14.so.1" | head -1 | xargs -I{} ln -sf {} /usr/lib/libclang.so
 
 
 # Copy scanner
