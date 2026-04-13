@@ -1,5 +1,5 @@
 name: 'COBALT Security Scanner'
-description: 'Z3-verified integer overflow detection (CWE-190/195/196/197) for C/C++ repos. Zero false positives — every finding is formally proven reachable by the Z3 SMT solver.'
+description: 'Z3-verified integer overflow detection for C/C++. Every finding formally proven by Z3 SMT — zero false positives.'
 author: 'Dominik Blain — QreativeLab'
 
 branding:
